@@ -13,6 +13,17 @@ var maquinaExpendedora = {
                 }
             }
             return false;
+        },
+        esProducto: function(datos) {
+            
+        }
+    },
+    gestionProducto: {
+        agregar: function(clave, objeto) {
+            
+        },
+        eliminar: function(clave, objeto) {
+            
         }
     },
     gestionClientes: {
@@ -45,26 +56,66 @@ var maquinaExpendedora = {
 
         },
         saldoTotal: function(clave, usuario) {
-            let entrada = clientes.filter(users => users.usuario === usuario);
-            console.log(entrada);
-            // if((user.usuario === usuario) && (user.pass === clave)){
-            //     console.log("dentro");
-            // } else {
-            //     console.log(-1);
-            // }
+            var saldo = -1;
+            for(i=0; i<clientes.length;i++) {
+                if((clientes[i].usuario === usuario) && (clientes[i].pass === clave)){
+                    saldo = clientes[i].presupuesto;
+                    console.log("El presupuesto de "+ clientes[i].usuario + " es de " + saldo + "€");
+                    break;
+                }
+            }
+            return saldo;
         },
         gastoTotal: function(clave, usuario) {
-            //Solución aquí
+            var gasto = false;
+            for(i=0; i<clientes.length;i++) {
+                if((clientes[i].usuario === usuario) && (clientes[i].pass === clave)){
+                    gasto = clientes[i].gasto;
+                    console.log(gasto);
+                    break;
+                }
+            }
+            return gasto;
         }
     }
 }
 
-var productos = [];
+var productos = [{
+    nombre: "Risketos",
+    codigo: "C1",
+    stock: 100,
+    disponibilidad: true,
+    precio: 1
+}, {
+    nombre: "KitKat",
+    codigo: "C2",
+    stock: 4,
+    disponibilidad: true,
+    precio: 2
+}, {
+    nombre: "Chicles Orbit",
+    codigo: "C3",
+    stock: 6,
+    disponibilidad: true,
+    precio: 3
+}, {
+    nombre: "Pipas Solero",
+    codigo: "C4",
+    stock: 1,
+    disponibilidad: true,
+    precio: 4
+}, {
+    nombre: "Demonios de Fresa",
+    codigo: "C5",
+    stock: 10,
+    disponibilidad: true,
+    precio: 5
+}];
 
 var clientes = [
-    {nombre:"Pedro", usuario:"Jera", pass:"1234", tipo: "", presupuesto:100},
-    {nombre:"Juan", usuario:"Juan", pass:"1234", tipo: "", presupuesto:100},
-    {nombre:"Maria", usuario:"Bari", pass:"1234", tipo: "", presupuesto:100}
+    {nombre:"Pedro", usuario:"Jera", pass:"1234", tipo: "", presupuesto:100, gasto:[]},
+    {nombre:"Juan", usuario:"Juan", pass:"1234", tipo: "", presupuesto:100, gasto:[]},
+    {nombre:"Maria", usuario:"Bari", pass:"1234", tipo: "", presupuesto:100, gasto:[]}
 ];
 
 // console.log(clientes);
@@ -102,4 +153,8 @@ maquinaExpendedora.gestionClientes.eliminar("ficticiaMola", "ulises2"); // Usuar
 
 // Testeando Saldo:
 maquinaExpendedora.gestionClientes.saldoTotal(); // -1
-maquinaExpendedora.gestionClientes.saldoTotal("1234", "Juan"); // 1000
+maquinaExpendedora.gestionClientes.saldoTotal("1234", "Juan"); // 100
+
+// Testrando Gasto:
+maquinaExpendedora.gestionClientes.gastoTotal(); // false
+maquinaExpendedora.gestionClientes.gastoTotal("1234", "Bari"); // []
