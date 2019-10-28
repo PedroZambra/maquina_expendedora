@@ -1,7 +1,7 @@
 //GLOBALES
 var maquinaExpendedora = {
     admin: {
-        secreto: "ficticiaMola"
+        secreto: "fictiziaMola"
     },
     herramientas: {
         esUsuario: function(user) {
@@ -15,15 +15,45 @@ var maquinaExpendedora = {
             return false;
         },
         esProducto: function(datos) {
-            
+            if(datos){
+                var existeProducto = false;
+                for(var i=0;i<productos.length;i++) {
+                    if(productos[i].codigo === datos.codigo || productos[i].nombre === datos.producto){
+                        existeProducto = true;
+                        break;
+                    }
+                }
+                return existeProducto;
+            } else {
+                return -1;
+            }
         }
     },
     gestionProducto: {
         agregar: function(clave, objeto) {
-            
+            if(maquinaExpendedora.admin.secreto === clave) {
+                if(objeto.nombre && objeto.codigo && objeto.precio && objeto.stock && objeto.disponibilidad) {
+                    productos.push(objeto);
+                    console.log(productos);
+                } else {
+                    console.log("Faltan campos!");
+                }
+            } else {
+                console.log("ERROR - Contraseña incorrecta");
+            }
         },
         eliminar: function(clave, objeto) {
-            
+            if(clave === maquinaExpendedora.admin.secreto) {
+                if(maquinaExpendedora.herramientas.esProducto(objeto) === false) {
+                    console.log("ERROR - No existe");
+                } else {
+                    productos = productos.filter((producto => producto.nombre != objeto.producto));
+                    console.log("Producto eliminado con exito");
+                    console.log(productos);
+                }
+            } else {
+                console.log("ERROR - Contraseña incorrecta");
+            }
         }
     },
     gestionClientes: {
@@ -51,7 +81,7 @@ var maquinaExpendedora = {
                     clientes = clientes.filter(users => users.usuario != usuario);
                 }
             } else {
-                console.log("ERROR - Contraseña Erronea!")
+                console.log("ERROR - Contraseña Erronea!");
             }
 
         },
@@ -76,6 +106,29 @@ var maquinaExpendedora = {
                 }
             }
             return gasto;
+        },
+        comprar: function(clave, usuario, codigo) {
+            for(i=0; i<clientes.length;i++) {
+                if((clientes[i].usuario === usuario) && (clientes[i].pass === clave)){
+                    for(j=0;j<productos.length;j++) {
+                        if(productos[j].codigo === codigo) {
+                            saldo = clientes[i].presupuesto - productos[j].precio;
+                            console.log("Gracias por comprar, su saldo actual es de " + saldo + "€.");
+                            break;
+                        } else {
+                            console.log("El producto no existe");
+                            break;
+                        }
+                    }
+                   break;
+                } else if (clientes[i].pass != clave) {
+                    console.log("ERROR - Contraseña incorrecta");
+                    break;
+                } else if (maquinaExpendedora.herramientas.esUsuario(usuario) === false){
+                    console.log("ERROR - Usuario incorrecto");
+                    break;
+                }
+            }
         }
     }
 }
@@ -129,14 +182,14 @@ maquinaExpendedora.herramientas.esUsuario("yo mismo"); // false
 // Testeando agregar:
 maquinaExpendedora.gestionClientes.agregar(); // ERROR - Contraseña Erronea!
 maquinaExpendedora.gestionClientes.agregar("hola"); // ERROR - Contraseña Erronea!
-maquinaExpendedora.gestionClientes.agregar("ficticiaMola", {
+maquinaExpendedora.gestionClientes.agregar("fictiziaMola", {
     usuario: "Juan"
 }); // ERROR - El usuario ya existe!
-maquinaExpendedora.gestionClientes.agregar("ficticiaMola", {
+maquinaExpendedora.gestionClientes.agregar("fictiziaMola", {
     usuario: "Ulises2",
     presupuesto: 1000
 }); // ERROR - Faltan datos! 
-maquinaExpendedora.gestionClientes.agregar("ficticiaMola", {
+maquinaExpendedora.gestionClientes.agregar("fictiziaMola", {
     usuario: "ulises2",
     presupuesto: 1000,
     tipo: "admin",
@@ -146,9 +199,9 @@ maquinaExpendedora.gestionClientes.agregar("ficticiaMola", {
 
 // Testeando borrar:
 maquinaExpendedora.gestionClientes.eliminar(); // ERROR - Contraseña Erronea!
-maquinaExpendedora.gestionClientes.eliminar("ficticiaMola"); // ERROR - El usuario no existe!
-maquinaExpendedora.gestionClientes.eliminar("ficticiaMola", "Yo mismo"); // ERROR - El usuario no existe!
-maquinaExpendedora.gestionClientes.eliminar("ficticiaMola", "ulises2"); // Usuario Eliminado con exito
+maquinaExpendedora.gestionClientes.eliminar("fictiziaMola"); // ERROR - El usuario no existe!
+maquinaExpendedora.gestionClientes.eliminar("fictiziaMola", "Yo mismo"); // ERROR - El usuario no existe!
+maquinaExpendedora.gestionClientes.eliminar("fictiziaMola", "ulises2"); // Usuario Eliminado con exito
 
 
 // Testeando Saldo:
@@ -158,3 +211,54 @@ maquinaExpendedora.gestionClientes.saldoTotal("1234", "Juan"); // 100
 // Testrando Gasto:
 maquinaExpendedora.gestionClientes.gastoTotal(); // false
 maquinaExpendedora.gestionClientes.gastoTotal("1234", "Bari"); // []
+
+//PASO 4    
+
+// Testeando esProducto:
+maquinaExpendedora.herramientas.esProducto() // -1
+maquinaExpendedora.herramientas.esProducto({
+        codigo: "C10"
+    }) // false
+maquinaExpendedora.herramientas.esProducto({
+        codigo: "C2"
+    }) // true
+maquinaExpendedora.herramientas.esProducto({
+        producto: "Inventado"
+    }) // false
+maquinaExpendedora.herramientas.esProducto({
+        producto: "Risketos"
+    }) // true
+
+// Testeando agregar producto:
+maquinaExpendedora.gestionProducto.agregar() // ERROR - Contraseña Erronea!
+maquinaExpendedora.gestionProducto.agregar("fictiziaMola", { 
+        nombre: "Chetos"
+    }) // ERROR - Faltan datos!
+maquinaExpendedora.gestionProducto.agregar("fictiziaMola", {
+        nombre: "Chetos",
+        codigo: "C6",
+        precio: 6,
+        stock: 5,
+        disponibilidad: true
+    }) // Producto Agregado con exito    
+
+// Testrando eliminar producto:
+maquinaExpendedora.gestionProducto.eliminar() // ERROR - Contraseña Erronea!
+maquinaExpendedora.gestionProducto.eliminar("fictiziaMola", {
+        producto: "inventado"
+    }) // ERROR - El producto no existe!
+maquinaExpendedora.gestionProducto.eliminar("fictiziaMola", {
+        producto: "Chetos"
+    }); // Producto Eliminado con exito    
+
+// Testeando Comprar producto:
+var comprar = maquinaExpendedora.gestionClientes.comprar;
+comprar() // ERROR - Contraseña Errónea!
+comprar("1234", "Eduardo"); // ERROR - El usuario no existe!
+comprar("asdf", "Juan"); // ERROR - Contraseña Incorrecta!
+comprar("1234", "Juan", "A1"); // El producto no existe!
+comprar("1234", "Juan", "C1");
+// Saldo Restante: 99
+// Gracias por comprar... que tenga un buen día!
+
+////PASO 5
